@@ -1,14 +1,18 @@
 class InvoicesController < ApplicationController
   def create
-    Invoice.create(invoice_params)
-    head :created
+    invoice = Invoice.new(invoice_params)
+    if invoice.save
+      return head :created
+    else
+      return head :bad_request
+    end
   rescue ActionController::ParameterMissing
-    head :bad_request
+    return head :bad_request
   end
 
   private
 
   def invoice_params
-    params.require(:invoice).permit(:number)
+    params.require(:invoice).permit(:number, :date, :month, :date_of_payment)
   end
 end
