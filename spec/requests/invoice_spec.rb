@@ -26,6 +26,13 @@ RSpec.describe "Invoice requests", :type => :request do
       it 'creates invoice' do
         expect{ subject }.to change{ Invoice.count }.by(1)
       end
+
+      it 'mounts invoice document' do
+        subject
+        invoice = Invoice.last
+        document = invoice.invoice_document
+        expect(document.url).to eq("/uploads/invoice/invoice_document/#{invoice.id}/faktura08-2017.pdf")
+      end
     end
 
     context 'params without invoice wrapper' do
