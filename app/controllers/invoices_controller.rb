@@ -1,13 +1,12 @@
 class InvoicesController < ApplicationController
   def create
-    invoice = Invoice.new(invoice_params)
-    if invoice.save
-      return head :created
+    if Invoice.create(invoice_params)
+      head :created
     else
-      return head :bad_request
+      head :bad_request
     end
   rescue ActionController::ParameterMissing
-    return head :bad_request
+    head :bad_request
   end
 
   private
