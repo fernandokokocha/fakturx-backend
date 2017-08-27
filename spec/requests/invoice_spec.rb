@@ -5,7 +5,7 @@ RSpec.describe "Invoice requests", :type => :request do
     let(:params) {
       {
         invoice: {
-          number: 'abc',
+          number: '001/08/2017',
           date: '30-08-2017',
           month: '08-2017',
           date_of_payment: '10-09-2017',

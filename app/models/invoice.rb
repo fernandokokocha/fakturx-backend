@@ -9,10 +9,9 @@ class Invoice < ApplicationRecord
   after_validation :create_document
 
   def create_document
-    pdf = Prawn::Document.new
-    pdf.text('Hello World')
+    rendered_pdf = BuildInvoiceDocument.new.call(self)
 
-    s = StringIO.new(pdf.render)
+    s = StringIO.new(rendered_pdf)
 
     def s.month=(month)
       @month = month

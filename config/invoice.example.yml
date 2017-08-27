@@ -1,0 +1,38 @@
+production:
+  sender:
+    name: 'John Doe'
+    address: 'Homelsss'
+    post_code: '51-000 Wrocław'
+    tax_number: 'NIP: 1234'
+    bank_account_number: 'Numer rachunku: 11 1111 1111 0000 1111 1111 1111'
+  recipient:
+    name: 'Nobody'
+    address: 'Homelss too'
+    post_code: '53-000 Wrocław'
+    tax_number: 'NIP: 5678'
+
+development:
+  sender:
+    name: 'John Doe'
+    address: 'Homelsss'
+    post_code: '51-000 Wrocław'
+    tax_number: 'NIP: 1234'
+    bank_account_number: 'Numer rachunku: 11 1111 1111 0000 1111 1111 1111'
+  recipient:
+    name: 'Nobody'
+    address: 'Homelss too'
+    post_code: '53-000 Wrocław'
+    tax_number: 'NIP: 5678'
+
+test:
+  sender:
+    name: 'John Doe'
+    address: 'Homelsss'
+    post_code: '51-000 Wrocław'
+    tax_number: 'NIP: 1234'
+    bank_account_number: 'Numer rachunku: 11 1111 1111 0000 1111 1111 1111'
+  recipient:
+    name: 'Nobody'
+    address: 'Homelss too'
+    post_code: '53-000 Wrocław'
+    tax_number: 'NIP: 5678'
