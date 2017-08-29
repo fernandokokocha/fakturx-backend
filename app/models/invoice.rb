@@ -6,6 +6,10 @@ class Invoice < ApplicationRecord
 
   mount_uploader :invoice_document, InvoiceDocumentUploader
 
+  has_many :items
+  accepts_nested_attributes_for :items
+  validates :items, length: { minimum: 1 }
+
   after_validation :create_document
 
   def create_document

@@ -9,6 +9,12 @@ RSpec.describe "Invoice requests", :type => :request do
           date: '30-08-2017',
           month: '08-2017',
           date_of_payment: '10-09-2017',
+          items_attributes: [
+            {
+              name: 'Rzecz',
+              net_value: '5000.00zł',
+            }
+          ]
         }
       }
     }
@@ -25,6 +31,39 @@ RSpec.describe "Invoice requests", :type => :request do
 
       it 'creates invoice' do
         expect{ subject }.to change{ Invoice.count }.by(1)
+      end
+
+      it 'creates item' do
+        expect{ subject }.to change{ Item.count }.by(1)
+      end
+
+      it 'mounts invoice document' do
+        subject
+        invoice = Invoice.last
+        document = invoice.invoice_document
+        expect(document.url).to eq("/uploads/invoice/invoice_document/#{invoice.id}/faktura08-2017.pdf")
+      end
+    end
+
+    context 'happy path - with multiple items' do
+      subject do
+        new_params = params
+        new_params[:invoice][:items_attributes] << { name: 'xyz', net_value: '1000.50zł' }
+        new_params[:invoice][:items_attributes] << { name: 'asdf', net_value: '49.99' }
+        post '/invoice', params: new_params
+      end
+
+      it 'returns 201' do
+        subject
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'creates invoice' do
+        expect{ subject }.to change{ Invoice.count }.by(1)
+      end
+
+      it 'creates 3 items' do
+        expect{ subject }.to change{ Item.count }.by(3)
       end
 
       it 'mounts invoice document' do
@@ -53,19 +92,31 @@ RSpec.describe "Invoice requests", :type => :request do
       it "doesn't create invoice" do
         expect{ subject }.to_not change{ Invoice.count }
       end
+
+      it "doesn't create item" do
+        expect{ subject }.to_not change{ Item.count }
+      end
     end
 
-    [:number, :date, :month, :date_of_payment].each do |param|
+    [:number, :date, :month, :date_of_payment, :items_attributes].each do |param|
       context "missing #{param}" do
-        let(:invalid_params) { params[:invoice].delete(param) }
-
         subject do
+          invalid_params = params
+          invalid_params[:invoice].delete(param)
           post '/invoice', params: invalid_params
         end
 
         it 'returns 400' do
           subject
           expect(response).to have_http_status(:bad_request)
+        end
+
+        it "doesn't create invoice" do
+          expect{ subject }.to_not change{ Invoice.count }
+        end
+
+        it "doesn't create item" do
+          expect{ subject }.to_not change{ Item.count }
         end
       end
     end

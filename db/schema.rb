@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170826180555) do
+ActiveRecord::Schema.define(version: 20170829164920) do
 
   create_table "invoices", force: :cascade do |t|
     t.string "number"
@@ -20,6 +20,18 @@ ActiveRecord::Schema.define(version: 20170826180555) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "invoice_document"
+  end
+
+  create_table "items", force: :cascade do |t|
+    t.string "name"
+    t.string "measure", default: "szt."
+    t.integer "quantity", default: 1
+    t.decimal "net_value", precision: 10, scale: 2
+    t.integer "tax_value", default: 23
+    t.integer "invoice_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invoice_id"], name: "index_items_on_invoice_id"
   end
 
 end

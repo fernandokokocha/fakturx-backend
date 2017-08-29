@@ -4,8 +4,8 @@ class BuildInvoiceDocument
   def call(invoice)
     @pdf = Prawn::Document.new
     @invoice = invoice
-    @column_width = [150, 30, 30, 70, 70, 70]
-    @column_width.push(pdf.bounds.right - sum_upto(@column_width, 5))
+    @column_width = [150, 30, 30, 80, 80, 20, 60]
+    @column_width.push(pdf.bounds.right - sum_upto(@column_width, 6))
 
     set_typography
 
@@ -18,7 +18,10 @@ class BuildInvoiceDocument
       build_sender
       build_recipient
       build_invoice_data
-      build_products
+      build_products_header
+      invoice.items.each do |item|
+        build_product(item)
+      end
     end
 
     pdf.render
@@ -106,47 +109,123 @@ class BuildInvoiceDocument
     end
   end
 
-  def build_products
+  def build_products_header
+    height = 40
+
     pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right) do
-      pdf.bounding_box([0, 0], :width => column_width[0]) do
-        pdf.move_down(5)
+      pdf.bounding_box([0, 0], width: column_width[0], height: height) do
+        pdf.move_down(10)
         pdf.text('Nazwa towaru / usługi', align: :center)
         pdf.stroke_bounds
       end
 
-      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 0), pdf.bounds.top], :width => column_width[1]) do
-        pdf.move_down(5)
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 0), pdf.bounds.top], width: column_width[1], height: height) do
+        pdf.move_down(10)
         pdf.text('j.m.', align: :center)
         pdf.stroke_bounds
       end
 
-      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 1), pdf.bounds.top], :width =>column_width[2]) do
-        pdf.move_down(5)
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 1), pdf.bounds.top], width: column_width[2], height: height) do
+        pdf.move_down(10)
         pdf.text('Ilość', align: :center)
         pdf.stroke_bounds
       end
 
-      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 2), pdf.bounds.top], :width =>column_width[3]) do
-        pdf.move_down(5)
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 2), pdf.bounds.top], width: column_width[3], height: height) do
+        pdf.move_down(10)
         pdf.text('Cena jedn. netto', align: :center)
         pdf.stroke_bounds
       end
 
-      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 3), pdf.bounds.top], :width =>column_width[4]) do
-        pdf.move_down(5)
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 3), pdf.bounds.top], width: column_width[4], height: height) do
+        pdf.move_down(10)
         pdf.text('Wartość netto', align: :center)
         pdf.stroke_bounds
       end
 
-      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 4), pdf.bounds.top], :width =>column_width[5]) do
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 4), pdf.bounds.top], width: column_width[5] + column_width[6], height: height/2) do
         pdf.move_down(5)
         pdf.text('Podatek', align: :center)
         pdf.stroke_bounds
       end
 
-      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 5), pdf.bounds.top], :width =>column_width[6]) do
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 4), pdf.bounds.top - height/2], width: column_width[5], height: height/2) do
         pdf.move_down(5)
+        pdf.text('%', align: :center)
+        pdf.stroke_bounds
+      end
+
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 5), pdf.bounds.top - height/2], width: column_width[6], height: height/2) do
+        pdf.move_down(5)
+        pdf.text('Kwota', align: :center)
+        pdf.stroke_bounds
+      end
+
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 6), pdf.bounds.top], width: column_width[7], height: height) do
+        pdf.move_down(10)
         pdf.text('Wartość brutto', align: :center)
+        pdf.stroke_bounds
+      end
+    end
+  end
+
+  def build_product(item)
+    height = 30
+
+    pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right) do
+      pdf.bounding_box([0, 0], width: column_width[0], height: height) do
+        pdf.move_down(10)
+        pdf.text(item.name, align: :center)
+        pdf.stroke_bounds
+      end
+
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 0), pdf.bounds.top], width: column_width[1], height: height) do
+        pdf.move_down(10)
+        pdf.text(item.measure, align: :center)
+        pdf.stroke_bounds
+      end
+
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 1), pdf.bounds.top], width: column_width[2], height: height) do
+        pdf.move_down(10)
+        pdf.text(item.quantity.to_s, align: :center)
+        pdf.stroke_bounds
+      end
+
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 2), pdf.bounds.top], width: column_width[3], height: height) do
+        pdf.move_down(10)
+        pdf.indent(10) do
+          pdf.text(item.net_value.to_s, align: :left)
+        end
+        pdf.stroke_bounds
+      end
+
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 3), pdf.bounds.top], width: column_width[4], height: height) do
+        pdf.move_down(10)
+        pdf.indent(10) do
+          pdf.text("#{item.net_amount.to_s}", align: :left)
+        end
+        pdf.stroke_bounds
+      end
+
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 4), pdf.bounds.top], width: column_width[5], height: height) do
+        pdf.move_down(10)
+        pdf.text(item.tax_value.to_s, align: :center)
+        pdf.stroke_bounds
+      end
+
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 5), pdf.bounds.top], width: column_width[6], height: height) do
+        pdf.move_down(10)
+        pdf.indent(10) do
+          pdf.text("#{item.tax_amount.to_s}", align: :left)
+        end
+        pdf.stroke_bounds
+      end
+
+      pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 6), pdf.bounds.top], width: column_width[7], height: height) do
+        pdf.move_down(10)
+        pdf.indent(10) do
+          pdf.text("#{item.gross_amount.to_s}", align: :left)
+        end
         pdf.stroke_bounds
       end
     end
@@ -154,5 +233,9 @@ class BuildInvoiceDocument
 
   def sum_upto(collection, index)
     collection[0..index].inject(0, :+)
+  end
+
+  def nbsp
+    0xC2.chr + 0xA0.chr
   end
 end

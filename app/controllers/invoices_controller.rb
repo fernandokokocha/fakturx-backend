@@ -1,6 +1,7 @@
 class InvoicesController < ApplicationController
   def create
-    if Invoice.create(invoice_params)
+    invoice = Invoice.create(invoice_params)
+    if invoice.valid?
       head :created
     else
       head :bad_request
@@ -12,6 +13,6 @@ class InvoicesController < ApplicationController
   private
 
   def invoice_params
-    params.require(:invoice).permit(:number, :date, :month, :date_of_payment)
+    params.require(:invoice).permit(:number, :date, :month, :date_of_payment, items_attributes: [:name, :net_value])
   end
 end
