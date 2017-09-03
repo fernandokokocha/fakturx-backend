@@ -1,3 +1,5 @@
+require 'slownie'
+
 class BuildInvoiceDocument
   attr_accessor :pdf, :invoice, :column_width
 
@@ -22,6 +24,10 @@ class BuildInvoiceDocument
       invoice.items.each do |item|
         build_product(item)
       end
+      build_total_amounts
+
+      pdf.font_size(12)
+      build_summary
     end
 
     pdf.render
@@ -170,29 +176,29 @@ class BuildInvoiceDocument
   end
 
   def build_product(item)
-    height = 30
+    height = 20
 
     pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right) do
       pdf.bounding_box([0, 0], width: column_width[0], height: height) do
-        pdf.move_down(10)
+        pdf.move_down(5)
         pdf.text(item.name, align: :center)
         pdf.stroke_bounds
       end
 
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 0), pdf.bounds.top], width: column_width[1], height: height) do
-        pdf.move_down(10)
+        pdf.move_down(5)
         pdf.text(item.measure, align: :center)
         pdf.stroke_bounds
       end
 
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 1), pdf.bounds.top], width: column_width[2], height: height) do
-        pdf.move_down(10)
+        pdf.move_down(5)
         pdf.text(item.quantity.to_s, align: :center)
         pdf.stroke_bounds
       end
 
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 2), pdf.bounds.top], width: column_width[3], height: height) do
-        pdf.move_down(10)
+        pdf.move_down(5)
         pdf.indent(10) do
           pdf.text(item.net_value.to_s, align: :left)
         end
@@ -200,7 +206,7 @@ class BuildInvoiceDocument
       end
 
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 3), pdf.bounds.top], width: column_width[4], height: height) do
-        pdf.move_down(10)
+        pdf.move_down(5)
         pdf.indent(10) do
           pdf.text("#{item.net_amount.to_s}", align: :left)
         end
@@ -208,13 +214,13 @@ class BuildInvoiceDocument
       end
 
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 4), pdf.bounds.top], width: column_width[5], height: height) do
-        pdf.move_down(10)
+        pdf.move_down(5)
         pdf.text(item.tax_value.to_s, align: :center)
         pdf.stroke_bounds
       end
 
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 5), pdf.bounds.top], width: column_width[6], height: height) do
-        pdf.move_down(10)
+        pdf.move_down(5)
         pdf.indent(10) do
           pdf.text("#{item.tax_amount.to_s}", align: :left)
         end
@@ -222,7 +228,7 @@ class BuildInvoiceDocument
       end
 
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 6), pdf.bounds.top], width: column_width[7], height: height) do
-        pdf.move_down(10)
+        pdf.move_down(5)
         pdf.indent(10) do
           pdf.text("#{item.gross_amount.to_s}", align: :left)
         end
@@ -231,11 +237,88 @@ class BuildInvoiceDocument
     end
   end
 
+  def build_total_amounts
+    height = 20
+
+    pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right) do
+      pdf.bounding_box([sum_upto(column_width, 2), pdf.bounds.top], width: column_width[3], height: height) do
+        pdf.move_down(5)
+        pdf.indent(10) do
+          pdf.text("RAZEM", align: :left, style: :bold)
+        end
+      end
+
+      pdf.bounding_box([sum_upto(column_width, 3), pdf.bounds.top], width: column_width[4], height: height) do
+        pdf.move_down(5)
+        pdf.indent(10) do
+          pdf.text(invoice.net_sum.to_s, align: :left, style: :bold)
+        end
+        pdf.stroke_bounds
+      end
+
+      pdf.bounding_box([sum_upto(column_width, 4), pdf.bounds.top], width: column_width[5], height: height) do
+        pdf.move_down(5)
+        pdf.text("X", align: :center, style: :bold)
+        pdf.stroke_bounds
+      end
+
+      pdf.bounding_box([sum_upto(column_width, 5), pdf.bounds.top], width: column_width[6], height: height) do
+        pdf.move_down(5)
+        pdf.indent(10) do
+          pdf.text(invoice.tax_sum.to_s, align: :left, style: :bold)
+        end
+        pdf.stroke_bounds
+      end
+
+      pdf.bounding_box([sum_upto(column_width, 6), pdf.bounds.top], width: column_width[7], height: height) do
+        pdf.move_down(5)
+        pdf.indent(10) do
+          pdf.text(invoice.gross_sum.to_s, align: :left, style: :bold)
+        end
+        pdf.stroke_bounds
+      end
+    end
+  end
+
+  def build_summary
+    pdf.move_down(40)
+    build_summary_item('Do zapłaty:', "#{invoice.gross_sum.to_s}zł")
+    pdf.move_down(10)
+    build_summary_item('Słownie:', "#{zloty_slownie_from_value(invoice.gross_sum)} #{groszy_slownie_from_value(invoice.gross_sum)}")
+  end
+
+  def build_summary_item(name, value)
+    pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right) do
+      pdf.bounding_box([0, 0], :width => column_width[0]) do
+        pdf.move_down(5)
+        pdf.indent(20) do
+          pdf.text(name, style: :bold)
+        end
+      end
+
+      pdf.bounding_box([pdf.bounds.left + column_width[0], pdf.bounds.top], :width => pdf.bounds.right - column_width[0]) do
+        pdf.move_down(5)
+        pdf.indent(10) do
+          pdf.text(value)
+        end
+      end
+    end
+  end
+
   def sum_upto(collection, index)
     collection[0..index].inject(0, :+)
   end
 
-  def nbsp
-    0xC2.chr + 0xA0.chr
+  def zloty_slownie_from_value(value)
+    Slownie.slownie(value.truncate).capitalize
+  end
+
+  def groszy_slownie_from_value(value)
+    grosze = ((value - (value.truncate)) * 100.0).truncate
+    return 'zero groszy' if (grosze.to_s === '0')
+    Slownie.slownie(grosze)
+      .gsub('złotych', 'groszy')
+      .gsub('złoty', 'grosz')
+      .gsub('złote', 'grosze')
   end
 end

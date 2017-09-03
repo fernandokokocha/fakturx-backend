@@ -28,4 +28,22 @@ class Invoice < ApplicationRecord
     s.month = self.month
     self.invoice_document = s
   end
+
+  def net_sum
+    items.inject(0) do |result, item|
+      result += item.net_amount
+    end
+  end
+
+  def tax_sum
+    items.inject(0) do |result, item|
+      result += item.tax_amount
+    end
+  end
+
+  def gross_sum
+    items.inject(0) do |result, item|
+      result += item.gross_amount
+    end
+  end
 end
