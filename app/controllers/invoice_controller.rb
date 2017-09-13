@@ -1,4 +1,9 @@
-class InvoicesController < ApplicationController
+class InvoiceController < ApplicationController
+  def index
+    @invoices = Invoice.all
+    render json: @invoices
+  end
+
   def create
     invoice = Invoice.create(invoice_params)
     if invoice.valid?

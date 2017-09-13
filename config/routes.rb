@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  resource :invoice, only: [:create]
+  resources :invoice, only: [:index, :create]
 end

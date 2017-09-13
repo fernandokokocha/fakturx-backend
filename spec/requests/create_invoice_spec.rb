@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Invoice requests", :type => :request do
+RSpec.describe "Create invoice", :type => :request do
   describe 'POST /invoice' do
     let(:params) {
       {
