@@ -12,7 +12,7 @@ RSpec.describe "Invoice requests", :type => :request do
           items_attributes: [
             {
               name: 'Rzecz',
-              net_value: '5000.00zł',
+              net_value: '5000.00',
             }
           ]
         }
@@ -48,7 +48,7 @@ RSpec.describe "Invoice requests", :type => :request do
     context 'happy path - with multiple items' do
       subject do
         new_params = params
-        new_params[:invoice][:items_attributes] << { name: 'xyz', net_value: '1000.50zł' }
+        new_params[:invoice][:items_attributes] << { name: 'xyz', net_value: '1000.50' }
         new_params[:invoice][:items_attributes] << { name: 'asdf', net_value: '49.99' }
         post '/invoice', params: new_params
       end

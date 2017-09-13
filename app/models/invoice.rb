@@ -10,7 +10,7 @@ class Invoice < ApplicationRecord
   accepts_nested_attributes_for :items
   validates :items, length: { minimum: 1 }
 
-  after_validation :create_document
+  after_create :create_document
 
   def create_document
     rendered_pdf = BuildInvoiceDocument.new.call(self)
@@ -27,6 +27,7 @@ class Invoice < ApplicationRecord
 
     s.month = self.month
     self.invoice_document = s
+    self.save
   end
 
   def net_sum

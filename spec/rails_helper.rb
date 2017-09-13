@@ -22,6 +22,19 @@ require 'rspec/rails'
 #
 # Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
+# What a hack! <3
+silenced = [
+  /The behavior of `attribute_changed\?` inside of after callbacks will be changing in the next version of Rails./
+]
+
+silenced_expr = Regexp.new(silenced.join('|'))
+
+ActiveSupport::Deprecation.behavior = lambda do |msg, stack|
+  unless msg =~ silenced_expr
+    ActiveSupport::Deprecation::DEFAULT_BEHAVIORS[:stderr].call(msg, stack)
+  end
+end
+
 # Checks for pending migration and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
 ActiveRecord::Migration.maintain_test_schema!
