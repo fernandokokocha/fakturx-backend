@@ -74,6 +74,28 @@ RSpec.describe "Create invoice", :type => :request do
       end
     end
 
+    context 'happy path - with explicit gross amount' do
+      subject do
+        new_params = params
+        new_params[:invoice][:items_attributes].first[:gross_amount] = '9451.55'
+        post '/invoice', params: new_params
+      end
+
+      it 'returns 201' do
+        subject
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'creates invoice' do
+        expect{ subject }.to change{ Invoice.count }.by(1)
+      end
+
+      it 'overwrites default gross amount' do
+        subject
+        expect(Invoice.last.items.first.gross_amount).to eq(BigDecimal.new('9451.55'))
+      end
+    end
+
     context 'params without invoice wrapper' do
       let(:params) {
         {

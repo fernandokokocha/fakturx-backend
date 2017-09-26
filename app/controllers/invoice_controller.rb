@@ -18,6 +18,6 @@ class InvoiceController < ApplicationController
   private
 
   def invoice_params
-    params.require(:invoice).permit(:number, :date, :month, :date_of_payment, items_attributes: [:name, :net_value])
+    params.require(:invoice).permit(:number, :date, :month, :date_of_payment, items_attributes: [:name, :net_value, :gross_amount])
   end
 end
