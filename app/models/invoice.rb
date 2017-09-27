@@ -47,4 +47,8 @@ class Invoice < ApplicationRecord
       result += item.gross_amount
     end
   end
+
+  def url
+    self.invoice_document.path
+  end
 end
