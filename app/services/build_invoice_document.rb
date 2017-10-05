@@ -90,10 +90,10 @@ class BuildInvoiceDocument
   end
 
   def build_invoice_data
-    build_invoice_data_item('Data wystawienia:', invoice.date.to_s)
-    build_invoice_data_item('Miesiąc sprzedaży:', invoice.month.to_s)
+    build_invoice_data_item('Data wystawienia:', invoice.date.strftime('%d.%m.%y'))
+    build_invoice_data_item('Miesiąc sprzedaży:', invoice.month)
     build_invoice_data_item('Sposób płatności:', 'Przelew')
-    build_invoice_data_item('Termin płatności:', invoice.date_of_payment.to_s)
+    build_invoice_data_item('Termin płatności:', invoice.date_of_payment.strftime('%d.%m.%y'))
   end
 
   def build_invoice_data_item(name, value)
@@ -177,7 +177,8 @@ class BuildInvoiceDocument
   end
 
   def build_product(item)
-    height = 20
+    rows = (item.name.length / 30.0).ceil
+    height = 20 * rows
 
     pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right) do
       pdf.bounding_box([0, 0], width: column_width[0], height: height) do
@@ -201,7 +202,7 @@ class BuildInvoiceDocument
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 2), pdf.bounds.top], width: column_width[3], height: height) do
         pdf.move_down(5)
         pdf.indent(10) do
-          pdf.text(item.net_value.to_s, align: :left)
+          pdf.text("#{"%.2f" % item.net_value}", align: :left)
         end
         pdf.stroke_bounds
       end
@@ -209,7 +210,7 @@ class BuildInvoiceDocument
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 3), pdf.bounds.top], width: column_width[4], height: height) do
         pdf.move_down(5)
         pdf.indent(10) do
-          pdf.text("#{item.net_amount.to_s}", align: :left)
+          pdf.text("#{"%.2f" % item.net_amount}", align: :left)
         end
         pdf.stroke_bounds
       end
@@ -223,7 +224,7 @@ class BuildInvoiceDocument
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 5), pdf.bounds.top], width: column_width[6], height: height) do
         pdf.move_down(5)
         pdf.indent(10) do
-          pdf.text("#{item.tax_amount.to_s}", align: :left)
+          pdf.text("#{"%.2f" % item.tax_amount}", align: :left)
         end
         pdf.stroke_bounds
       end
@@ -231,7 +232,7 @@ class BuildInvoiceDocument
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 6), pdf.bounds.top], width: column_width[7], height: height) do
         pdf.move_down(5)
         pdf.indent(10) do
-          pdf.text("#{item.gross_amount.to_s}", align: :left)
+          pdf.text("#{"%.2f" % item.gross_amount}", align: :left)
         end
         pdf.stroke_bounds
       end
@@ -283,7 +284,7 @@ class BuildInvoiceDocument
 
   def build_summary
     pdf.move_down(40)
-    build_summary_item('Do zapłaty:', "#{invoice.gross_sum.to_s}zł")
+    build_summary_item('Do zapłaty:', "#{invoice.gross_sum.to_s} zł")
     pdf.move_down(10)
     build_summary_item('Słownie:', "#{zloty_slownie_from_value(invoice.gross_sum)} #{groszy_slownie_from_value(invoice.gross_sum)}")
   end
