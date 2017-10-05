@@ -28,6 +28,7 @@ class BuildInvoiceDocument
 
       pdf.font_size(12)
       build_summary
+      build_annotation
     end
 
     pdf.render
@@ -303,6 +304,11 @@ class BuildInvoiceDocument
         end
       end
     end
+  end
+
+  def build_annotation
+    pdf.move_down(50)
+    pdf.text('Faktura nie wymaga podpisu.', style: :italic)
   end
 
   def sum_upto(collection, index)
