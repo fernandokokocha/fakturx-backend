@@ -1,13 +1,15 @@
 require 'slownie'
 
 class BuildInvoiceDocument
-  attr_accessor :pdf, :invoice, :column_width
+  attr_accessor :pdf, :invoice, :column_width, :date_format
 
   def call(invoice)
     @pdf = Prawn::Document.new
     @invoice = invoice
     @column_width = [150, 30, 30, 80, 80, 20, 60]
     @column_width.push(pdf.bounds.right - sum_upto(@column_width, 6))
+
+    @date_format = '%d.%m.%y'
 
     set_typography
 
@@ -90,10 +92,10 @@ class BuildInvoiceDocument
   end
 
   def build_invoice_data
-    build_invoice_data_item('Data wystawienia:', invoice.date.strftime('%d.%m.%y'))
+    build_invoice_data_item('Data wystawienia:', invoice.date.strftime(date_format))
     build_invoice_data_item('Miesiąc sprzedaży:', invoice.month)
     build_invoice_data_item('Sposób płatności:', 'Przelew')
-    build_invoice_data_item('Termin płatności:', invoice.date_of_payment.strftime('%d.%m.%y'))
+    build_invoice_data_item('Termin płatności:', invoice.date_of_payment.strftime(date_format))
   end
 
   def build_invoice_data_item(name, value)
@@ -202,7 +204,7 @@ class BuildInvoiceDocument
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 2), pdf.bounds.top], width: column_width[3], height: height) do
         pdf.move_down(5)
         pdf.indent(10) do
-          pdf.text("#{"%.2f" % item.net_value}", align: :left)
+          pdf.text(format_money(item.net_value), align: :left)
         end
         pdf.stroke_bounds
       end
@@ -210,7 +212,7 @@ class BuildInvoiceDocument
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 3), pdf.bounds.top], width: column_width[4], height: height) do
         pdf.move_down(5)
         pdf.indent(10) do
-          pdf.text("#{"%.2f" % item.net_amount}", align: :left)
+          pdf.text(format_money(item.net_amount), align: :left)
         end
         pdf.stroke_bounds
       end
@@ -224,7 +226,7 @@ class BuildInvoiceDocument
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 5), pdf.bounds.top], width: column_width[6], height: height) do
         pdf.move_down(5)
         pdf.indent(10) do
-          pdf.text("#{"%.2f" % item.tax_amount}", align: :left)
+          pdf.text(format_money(item.tax_amount), align: :left)
         end
         pdf.stroke_bounds
       end
@@ -232,7 +234,7 @@ class BuildInvoiceDocument
       pdf.bounding_box([pdf.bounds.left + sum_upto(column_width, 6), pdf.bounds.top], width: column_width[7], height: height) do
         pdf.move_down(5)
         pdf.indent(10) do
-          pdf.text("#{"%.2f" % item.gross_amount}", align: :left)
+          pdf.text(format_money(item.gross_amount), align: :left)
         end
         pdf.stroke_bounds
       end
@@ -253,7 +255,7 @@ class BuildInvoiceDocument
       pdf.bounding_box([sum_upto(column_width, 3), pdf.bounds.top], width: column_width[4], height: height) do
         pdf.move_down(5)
         pdf.indent(10) do
-          pdf.text(invoice.net_sum.to_s, align: :left, style: :bold)
+          pdf.text(format_money(invoice.net_sum), align: :left, style: :bold)
         end
         pdf.stroke_bounds
       end
@@ -267,7 +269,7 @@ class BuildInvoiceDocument
       pdf.bounding_box([sum_upto(column_width, 5), pdf.bounds.top], width: column_width[6], height: height) do
         pdf.move_down(5)
         pdf.indent(10) do
-          pdf.text(invoice.tax_sum.to_s, align: :left, style: :bold)
+          pdf.text(format_money(invoice.tax_sum), align: :left, style: :bold)
         end
         pdf.stroke_bounds
       end
@@ -275,7 +277,7 @@ class BuildInvoiceDocument
       pdf.bounding_box([sum_upto(column_width, 6), pdf.bounds.top], width: column_width[7], height: height) do
         pdf.move_down(5)
         pdf.indent(10) do
-          pdf.text(invoice.gross_sum.to_s, align: :left, style: :bold)
+          pdf.text(format_money(invoice.gross_sum), align: :left, style: :bold)
         end
         pdf.stroke_bounds
       end
@@ -327,5 +329,9 @@ class BuildInvoiceDocument
       .gsub('złotych', 'groszy')
       .gsub('złoty', 'grosz')
       .gsub('złote', 'grosze')
+  end
+
+  def format_money(value)
+    "#{"%.2f" % value}"
   end
 end
