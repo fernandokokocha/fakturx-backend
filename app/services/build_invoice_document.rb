@@ -286,7 +286,7 @@ class BuildInvoiceDocument
 
   def build_summary
     pdf.move_down(40)
-    build_summary_item('Do zapłaty:', "#{invoice.gross_sum.to_s} zł")
+    build_summary_item('Do zapłaty:', "#{format_money(invoice.gross_sum)} zł")
     pdf.move_down(10)
     build_summary_item('Słownie:', "#{zloty_slownie_from_value(invoice.gross_sum)} #{groszy_slownie_from_value(invoice.gross_sum)}")
   end
