@@ -1,14 +1,14 @@
 class Invoice < ApplicationRecord
+  has_many :items, dependent: :destroy
+  accepts_nested_attributes_for :items
+
+  validates :items, length: { minimum: 1 }
   validates :number, presence: true
   validates :date, presence: true
   validates :month, presence: true
   validates :date_of_payment, presence: true
 
   mount_uploader :invoice_document, InvoiceDocumentUploader
-
-  has_many :items
-  accepts_nested_attributes_for :items
-  validates :items, length: { minimum: 1 }
 
   after_create :create_document
 

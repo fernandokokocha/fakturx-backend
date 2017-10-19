@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Index invoices", :type => :request do
+RSpec.describe "Index invoices", type: :request do
   subject do
     get '/invoice'
   end
