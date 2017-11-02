@@ -45,9 +45,12 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.5.1)
       public_suffix (~> 2.0, >= 2.0.2)
+    amq-protocol (2.2.0)
     arel (8.0.0)
     bindex (0.5.0)
     builder (3.2.3)
+    bunny (2.7.1)
+      amq-protocol (>= 2.2.0)
     byebug (9.1.0)
     capybara (2.15.1)
       addressable
@@ -181,7 +184,15 @@ GEM
     selenium-webdriver (3.5.1)
       childprocess (~> 0.5)
       rubyzip (~> 1.0)
+    serverengine (1.5.11)
+      sigdump (~> 0.2.2)
+    sigdump (0.2.4)
     slop (3.6.0)
+    sneakers (2.6.0)
+      bunny (~> 2.7.0)
+      concurrent-ruby (~> 1.0)
+      serverengine (~> 1.5.11)
+      thor
     spring (2.0.2)
       activesupport (>= 4.2)
     spring-watcher-listen (2.0.1)
@@ -236,6 +247,7 @@ DEPENDENCIES
   rspec-rails (~> 3.6)
   sass-rails (~> 5.0)
   selenium-webdriver
+  sneakers
   spring
   spring-watcher-listen (~> 2.0.0)
   sqlite3
@@ -245,4 +257,4 @@ DEPENDENCIES
   web-console (>= 3.3.0)
 
 BUNDLED WITH
-   1.15.4
+   1.16.0.pre.3
