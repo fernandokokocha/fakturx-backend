@@ -42,11 +42,11 @@ RSpec.describe "Create invoice", type: :request do
         expect{ subject }.to change{ Item.count }.by(1)
       end
 
-      it 'mounts invoice document' do
+      it "doesnt mount invoice document" do
         subject
         invoice = Invoice.last
         document = invoice.invoice_document
-        expect(document.url).to eq("/uploads/invoice/invoice_document/#{invoice.id}/faktura08-2017.pdf")
+        expect(document.url).to be(nil)
       end
     end
 
@@ -75,7 +75,7 @@ RSpec.describe "Create invoice", type: :request do
         subject
         invoice = Invoice.last
         document = invoice.invoice_document
-        expect(document.url).to eq("/uploads/invoice/invoice_document/#{invoice.id}/faktura08-2017.pdf")
+        expect(document.url).to be(nil)
       end
     end
 

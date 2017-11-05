@@ -37,7 +37,13 @@ RSpec.describe "Index invoices", type: :request do
       expect(JSON.parse(response.body).length).to eq(1)
     end
 
-    ['id', 'number', 'gross_sum', 'date', 'url'].each do |attr|
+    it "renders invoice with url as nil" do
+      subject
+      invoice = JSON.parse(response.body).first
+      expect(invoice['url']).to be(nil)
+    end
+
+    ['id', 'number', 'gross_sum', 'date'].each do |attr|
       it "renders invoice with #{attr} attribute" do
         subject
         invoice = JSON.parse(response.body).first
