@@ -18,6 +18,7 @@ gem 'prawn'
 gem 'active_model_serializers', '~> 0.10.0'
 gem 'sneakers'
 gem 'rails-observers'
+gem 'aasm'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

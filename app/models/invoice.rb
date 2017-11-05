@@ -1,4 +1,6 @@
 class Invoice < ApplicationRecord
+  include AASM
+
   has_many :items, dependent: :destroy
   accepts_nested_attributes_for :items
 
@@ -9,6 +11,11 @@ class Invoice < ApplicationRecord
   validates :date_of_payment, presence: true
 
   mount_uploader :invoice_document, InvoiceDocumentUploader
+
+  aasm :column => 'state' do
+    state :awaiting, :initial => true
+    state :created
+  end
 
   def net_sum
     items.inject(0) do |result, item|

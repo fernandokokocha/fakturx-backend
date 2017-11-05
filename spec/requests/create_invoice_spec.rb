@@ -33,6 +33,11 @@ RSpec.describe "Create invoice", type: :request do
         expect{ subject }.to change{ Invoice.count }.by(1)
       end
 
+      it 'creates invoice in awaiting state' do
+        subject
+        expect(Invoice.last.state).to eq('awaiting')
+      end
+
       it 'creates item' do
         expect{ subject }.to change{ Item.count }.by(1)
       end
