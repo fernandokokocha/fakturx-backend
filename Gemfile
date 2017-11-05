@@ -17,6 +17,7 @@ gem 'carrierwave', '~> 1.0'
 gem 'prawn'
 gem 'active_model_serializers', '~> 0.10.0'
 gem 'sneakers'
+gem 'rails-observers'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

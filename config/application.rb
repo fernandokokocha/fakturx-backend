@@ -22,5 +22,7 @@ module FakturxBackend
       'Access-Control-Allow-Origin' => 'http://localhost:3000',
       'Access-Control-Request-Method' => %w{GET POST PUT}.join(",")
     }
+
+    config.active_record.observers = :invoice_observer
   end
 end
